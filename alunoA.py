@@ -1,91 +1,107 @@
 listaEventos = []
 proximo_id = 1
 
-def validarData(dataStr):
+def validarData(data):
     from datetime import datetime
     try:
-        datetime.strptime(dataStr, "%Y-%m-%d")
+        datetime.strptime(data, "%Y-%m-%d")
         return True
-    except ValueError:
+    except:
         return False
 
-def adicionarEvento(listaEventos, nome, data, local, categoria):
+def adicionarEvento(lista, nome, data, local, categoria):
     global proximo_id
-    if not nome or not data or not local or not categoria:
-        print("Erro: todos os campos devem ser preenchidos!\n")
+    if nome == "" or data == "" or local == "" or categoria == "":
+        print("Erro: preencha todos os campos")
         return
     if not validarData(data):
-        print("Erro: data inválida! Use o formato AAAA-MM-DD\n")
+        print("Erro: data invalida")
         return
-    evento = {"id": proximo_id, "nome": nome, "data": data, "local": local, "categoria": categoria}
-    listaEventos.append(evento)
+    evento = {
+        "id": proximo_id,
+        "nome": nome,
+        "data": data,
+        "local": local,
+        "categoria": categoria,
+        "participado": False
+    }
+    lista.append(evento)
     proximo_id += 1
-    print("Evento adicionado com sucesso!\n")
+    print("Evento adicionado!")
 
-def listarEventos(listaEventos):
-    if not listaEventos:
-        print("Nenhum evento cadastrado.\n")
+def listarEventos(lista):
+    if len(lista) == 0:
+        print("Nenhum evento")
         return
-    print("--- LISTA DE EVENTOS ---")
-    for e in listaEventos:
-        print(f"ID: {e['id']} | Nome: {e['nome']} | Data: {e['data']} | Local: {e['local']} | Categoria: {e['categoria']}")
-    print()
+    print("Lista de eventos:")
+    for e in lista:
+        print("ID:", e["id"], "| Nome:", e["nome"], "| Data:", e["data"], "| Local:", e["local"], "| Categoria:", e["categoria"])
 
-def procurarEventoPorNome(listaEventos, nome):
-    resultados = [e for e in listaEventos if nome.lower() in e["nome"].lower()]
+def procurarEventoPorNome(lista, nome):
+    resultados = []
+    for e in lista:
+        if nome.lower() in e["nome"].lower():
+            resultados.append(e)
     return resultados
 
-def deletarEvento(listaEventos, id):
-    for e in listaEventos:
+def deletarEvento(lista, id):
+    for e in lista:
         if e["id"] == id:
-            listaEventos.remove(e)
-            print("Evento deletado com sucesso!\n")
+            lista.remove(e)
+            print("Evento deletado")
             return
-    print("ID não encontrado!\n")
+    print("ID nao encontrado")
+
+def displayMenu():
+    print("\n=== Menu ===")
+    print("1 - Adicionar evento")
+    print("2 - Listar eventos")
+    print("3 - Procurar evento")
+    print("4 - Deletar evento")
+    print("5 - Filtrar categoria (em breve)")
+    print("6 - Marcar participacao (em breve)")
+    print("7 - Relatorio (em breve)")
+    print("8 - Sair")
+
+def getEscolhaDoUsuario():
+    escolha = input("Escolha uma opcao: ")
+    if escolha.isdigit():
+        return int(escolha)
+    return 0
 
 rodando = True
 while rodando:
-    print("=== Planejador de Eventos do IFB ===")
-    print("1 - Adicionar Evento")
-    print("2 - Listar Todos os Eventos")
-    print("3 - Procurar Evento por Nome")
-    print("4 - Deletar Evento por ID")
-    print("5 - procurar por categoria")
-    print("6 - Sair")
-    
-    escolha = input("Escolha uma opção: ")
-    
-    if escolha == "1":
+    displayMenu()
+    escolha = getEscolhaDoUsuario()
+
+    if escolha == 1:
         nome = input("Nome do evento: ")
-        data = input("Data (AAAA-MM-DD): ")
+        data = input("Data AAAA-MM-DD: ")
         local = input("Local: ")
         categoria = input("Categoria: ")
         adicionarEvento(listaEventos, nome, data, local, categoria)
-        
-    elif escolha == "2":
+
+    elif escolha == 2:
         listarEventos(listaEventos)
-        
-    elif escolha == "3":
-        nome = input("Digite o nome para buscar: ")
-        resultados = procurarEventoPorNome(listaEventos, nome)
-        if resultados:
-            print("--- RESULTADOS ---")
-            for e in resultados:
-                print(f"ID: {e['id']} | Nome: {e['nome']} | Data: {e['data']} | Local: {e['local']} | Categoria: {e['categoria']}")
-            print()
+
+    elif escolha == 3:
+        achados = procurarEventoPorNome(listaEventos, nome=input("Digite o nome: "))
+        if len(achados) == 0:
+            print("Nenhum encontrado")
         else:
-            print("Nenhum evento encontrado.\n")
-    
-    elif escolha == "4":
-        id_str = input("Digite o ID do evento para deletar: ")
+            for e in achados:
+                print("ID:", e["id"], "| Nome:", e["nome"], "| Data:", e["data"], "| Local:", e["local"], "| Categoria:", e["categoria"])
+
+    elif escolha == 4:
+        id_str = input("ID do evento: ")
         if id_str.isdigit():
             deletarEvento(listaEventos, int(id_str))
         else:
-            print("ID inválido!\n")
-            
-    elif escolha == "6":
-        print("Saindo do sistema...")
+            print("ID invalido")
+
+    elif escolha == 8:
+        print("Saindo...")
         rodando = False
-        
+
     else:
-        print("Opção inválida!\n")
+        print("Opcao invalida ou ainda nao implementada")
